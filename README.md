@@ -32,8 +32,9 @@ Coursework/
 1. В pgAdmin выполнить `database/create_database.sql` в базе `Coursework tester`.
 2. Выполнить тот же скрипт в запасной тестовой базе `Coursework test bsses`.
 3. Проверить пароли ролей в SQL, `MainApp/App.config` и `SystemWatcher/watcher.yml`.
-4. При необходимости настроить `MainApp/update.yml` на реальные GitHub Releases.
-5. Оформить пояснительную записку по структуре из `docs/COURSEWORK_STRUCTURE_NOTES.md`.
+4. Запустить `MainApp` и зарегистрировать первого пользователя: он автоматически станет `admin`.
+5. При необходимости настроить `MainApp/update.yml` на реальные GitHub Releases.
+6. Оформить пояснительную записку по структуре из `docs/COURSEWORK_STRUCTURE_NOTES.md`.
 
 ## Быстрый запуск
 

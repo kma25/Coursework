@@ -51,10 +51,20 @@ public sealed class AuthService
             return OperationResult.Fail("Пользователь с таким логином уже существует.");
         }
 
+        var users = await _users.GetAllAsync(authConnection, cancellationToken);
+        if (users.Count == 0 && role == UserRole.User)
+        {
+            // В новой базе еще нет администратора, поэтому первый зарегистрированный пользователь
+            // получает роль admin. Иначе управлять пользователями пришлось бы вручную через SQL.
+            role = UserRole.Admin;
+        }
+
         var createdUser = await _users.CreateAsync(login, _passwordHasher.Hash(password), role, authConnection, cancellationToken);
         await _securityLogs.AddAsync(createdUser.Id, "registration", $"Зарегистрирован пользователь {login}", authConnection, cancellationToken);
 
-        return OperationResult.Ok("Регистрация выполнена успешно.");
+        return OperationResult.Ok(role == UserRole.Admin
+            ? "Регистрация выполнена успешно. Первый пользователь создан с ролью admin."
+            : "Регистрация выполнена успешно.");
     }
 
     /// <summary>
