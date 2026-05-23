@@ -19,7 +19,7 @@ public static class AppConfiguration
         {
             DatabaseHost = Get(values, "DatabaseHost", "localhost"),
             DatabasePort = GetInt(values, "DatabasePort", 5432),
-            DatabaseName = Get(values, "DatabaseName", "it_support"),
+            DatabaseName = Get(values, "DatabaseName", "Coursework tester"),
             AuthUsername = Get(values, "AuthUsername", "app_auth"),
             AuthPassword = Get(values, "AuthPassword", "change_me"),
             Version = Get(values, "Version", "1.0.0"),

@@ -53,7 +53,7 @@ public sealed class AuthServiceTests
     {
         DatabaseHost = "localhost",
         DatabasePort = 5432,
-        DatabaseName = "it_support_test",
+        DatabaseName = "Coursework test bsses",
         AuthUsername = "app_auth",
         AuthPassword = "auth_pwd"
     };

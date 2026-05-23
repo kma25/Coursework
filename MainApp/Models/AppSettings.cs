@@ -20,7 +20,7 @@ public sealed class AppSettings
     /// <summary>
     /// Имя базы данных.
     /// </summary>
-    public string DatabaseName { get; init; } = "it_support";
+    public string DatabaseName { get; init; } = "Coursework tester";
 
     /// <summary>
     /// Учетная запись для стартовой авторизации и регистрации.
@@ -77,6 +77,9 @@ public sealed class AppSettings
     public string BuildRoleConnectionString(string roleCredentialFragment)
     {
         var credentials = ParseRoleCredentials(roleCredentialFragment);
+
+        // База специально не приходит из БД: так роль не может подменить Host/Port/Database,
+        // а приложение всегда берет эти значения из App.config.
         return BuildConnectionString(credentials.Username, credentials.Password);
     }
 

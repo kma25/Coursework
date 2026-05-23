@@ -13,5 +13,5 @@ try
 catch (Exception ex)
 {
     Console.WriteLine($"Установщик завершился ошибкой: {ex.Message}");
-    Console.WriteLine("Пример: AppInstaller --download-url https://server/app.zip --target C:\\Apps\\ItSupport --main-pid 1234 --app MainApp.exe");
+    Console.WriteLine("Пример: AppInstaller --download-url https://server/app.zip --target C:\\Apps\\Coursework --main-pid 1234 --app MainApp.exe");
 }

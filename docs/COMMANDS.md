@@ -13,7 +13,7 @@
 
 ## Настройка базы данных
 
-1. Создайте базу `it_support`.
+1. Создайте или выберите рабочую базу `Coursework tester`.
 2. Выполните `database/create_database.sql` от административной учетной записи PostgreSQL.
 3. Замените пароли `change_me_*` в ролях БД.
 4. Укажите эти же пароли в `MainApp/App.config` и `SystemWatcher/watcher.yml`.
@@ -116,7 +116,7 @@ update apply
 `AppInstaller` можно запустить отдельно:
 
 ```text
-AppInstaller --download-url https://example.com/app.zip --target C:\Apps\ItSupport --main-pid 1234 --app MainApp.exe
+AppInstaller --download-url https://example.com/app.zip --target C:\Apps\Coursework --main-pid 1234 --app MainApp.exe
 ```
 
 ## Тесты

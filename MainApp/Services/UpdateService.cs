@@ -25,7 +25,7 @@ public sealed class UpdateService
 
         if (!_httpClient.DefaultRequestHeaders.UserAgent.Any())
         {
-            _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ItSupportCourseProject", currentVersion));
+            _httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Coursework", currentVersion));
         }
     }
 
@@ -75,6 +75,8 @@ public sealed class UpdateService
         {
             var assetName = GetString(asset, "name");
             var url = GetString(asset, "browser_download_url");
+
+            // У GitHub в релизе может быть несколько файлов; приложению нужен именно архив сборки.
             if (assetName.EndsWith(extension, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrWhiteSpace(url))
             {
                 return url;

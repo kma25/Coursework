@@ -36,6 +36,7 @@ public sealed class PasswordHasher
         var expectedHash = Convert.FromBase64String(parts[3]);
         var actualHash = Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, expectedHash.Length);
 
+        // Обычное сравнение строк может выдать время совпавшего префикса; FixedTimeEquals этого не делает.
         return CryptographicOperations.FixedTimeEquals(actualHash, expectedHash);
     }
 }

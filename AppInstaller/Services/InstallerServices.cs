@@ -17,7 +17,7 @@ public sealed class GitHubReleaseService
     public GitHubReleaseService(HttpClient? httpClient = null)
     {
         _httpClient = httpClient ?? new HttpClient();
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ItSupportInstaller/1.0");
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("CourseworkInstaller/1.0");
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public sealed class ReleaseDownloadService
     public ReleaseDownloadService(HttpClient? httpClient = null)
     {
         _httpClient = httpClient ?? new HttpClient();
-        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("ItSupportInstaller/1.0");
+        _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("CourseworkInstaller/1.0");
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed class ProcessWaitService
         }
         catch (ArgumentException)
         {
-            // Процесс уже завершился, это штатная ситуация для обновления.
+            // Если пользователь закрыл приложение быстрее установщика, просто продолжаем обновление.
         }
     }
 }
@@ -188,7 +188,7 @@ public sealed class InstallerOrchestrator
     /// </summary>
     public async Task RunAsync(InstallerOptions options, CancellationToken cancellationToken = default)
     {
-        var tempDirectory = Path.Combine(Path.GetTempPath(), "ItSupportInstaller", Guid.NewGuid().ToString("N"));
+        var tempDirectory = Path.Combine(Path.GetTempPath(), "CourseworkInstaller", Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempDirectory);
 
         Console.WriteLine("Подготовка обновления...");

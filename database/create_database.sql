@@ -1,5 +1,5 @@
--- PostgreSQL script for the educational IT infrastructure support system.
--- Run this script from an administrative account during deployment only.
+-- SQL-скрипт схемы для курсового проекта Coursework.
+-- Запускается отдельно в рабочей базе "Coursework tester" и тестовой базе "Coursework test bsses".
 
 create table if not exists roles (
     id serial primary key,
@@ -76,6 +76,8 @@ language plpgsql
 security definer
 as $$
 begin
+    -- Приложение получает только Username/Password роли.
+    -- Host, Port и Database остаются в App.config, чтобы БД не управляла адресом подключения.
     case lower(app_role)
         when 'admin' then
             return 'Username=app_admin_role;Password=change_me_admin_password;';
@@ -100,6 +102,8 @@ as $$
 declare
     v_device_id integer;
 begin
+    -- Watcher не требует ручного добавления устройства: первая метрика создает запись,
+    -- следующие только обновляют имя и время последнего сигнала.
     insert into monitored_devices(device_key, device_name, last_seen_at)
     values (p_device_key, p_device_name, now())
     on conflict (device_key)

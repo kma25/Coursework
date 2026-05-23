@@ -1,6 +1,0 @@
-<Solution>
-  <Project Path="AppInstaller/AppInstaller.csproj" />
-  <Project Path="AppTests/AppTests.csproj" />
-  <Project Path="MainApp/MainApp.csproj" />
-  <Project Path="SystemWatcher/SystemWatcher.csproj" />
-</Solution>

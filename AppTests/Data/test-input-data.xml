@@ -13,6 +13,8 @@
   </registration>
   <database>
     <case name="проверка ролей" role="admin" />
+    <case name="рабочая база" database="Coursework tester" />
+    <case name="тестовая база" database="Coursework test bsses" />
     <case name="строка подключения" value="Username=app_user_role;Password=pwd;" />
     <case name="запрет postgres" username="postgres" />
     <case name="ошибка подключения" host="bad-host" />
@@ -28,6 +30,6 @@
     <case name="проверка обновлений" tag="v1.1.0" asset="app.zip" />
     <case name="ответ API без zip" tag="v1.1.0" asset="readme.txt" />
     <case name="ошибка API" status="500" />
-    <case name="параметры установщика" target="C:\Apps\ItSupport" app="MainApp.exe" />
+    <case name="параметры установщика" target="C:\Apps\Coursework" app="MainApp.exe" />
   </updates>
 </testData>
