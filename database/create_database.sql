@@ -92,9 +92,9 @@ $$;
 create or replace function save_system_metric(
     p_device_key text,
     p_device_name text,
-    p_cpu numeric,
-    p_ram numeric,
-    p_hdd numeric)
+    p_cpu double precision,
+    p_ram double precision,
+    p_hdd double precision)
 returns void
 language plpgsql
 security definer
@@ -111,7 +111,7 @@ begin
     returning id into v_device_id;
 
     insert into system_metrics(device_id, cpu_percent, ram_percent, hdd_percent)
-    values (v_device_id, p_cpu, p_ram, p_hdd);
+    values (v_device_id, round(p_cpu::numeric, 2), round(p_ram::numeric, 2), round(p_hdd::numeric, 2));
 end;
 $$;
 
@@ -145,4 +145,4 @@ grant insert on system_metrics to app_watcher_role;
 grant usage, select on sequence monitored_devices_id_seq, system_metrics_id_seq to app_watcher_role;
 
 grant execute on function get_role_connection(text) to app_auth;
-grant execute on function save_system_metric(text, text, numeric, numeric, numeric) to app_watcher_role;
+grant execute on function save_system_metric(text, text, double precision, double precision, double precision) to app_watcher_role;

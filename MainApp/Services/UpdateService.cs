@@ -47,7 +47,7 @@ public sealed class UpdateService
             var tagName = GetString(root, "tag_name");
             var name = GetString(root, "name");
             var body = GetString(root, "body");
-            var zipUrl = FindAssetUrl(root, _settings.UpdateAssetExtension);
+            var zipUrl = FindAssetUrl(root, _settings.UpdateAssetExtension) ?? FindSourceArchiveUrl(root, _settings.UpdateAssetExtension);
             var hasUpdate = IsNewerVersion(_currentVersion, tagName) && zipUrl is not null;
 
             var release = new UpdateRelease(hasUpdate, tagName, name, body, zipUrl);
@@ -84,6 +84,18 @@ public sealed class UpdateService
         }
 
         return null;
+    }
+
+    private static string? FindSourceArchiveUrl(JsonElement root, string extension)
+    {
+        if (!extension.Equals(".zip", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return root.TryGetProperty("zipball_url", out var value) && value.ValueKind == JsonValueKind.String
+            ? value.GetString()
+            : null;
     }
 
     private static bool IsNewerVersion(string currentVersion, string candidateVersion)

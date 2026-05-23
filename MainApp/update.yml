@@ -1,4 +1,4 @@
-updateOwner: example-owner
-updateRepo: it-infrastructure-support
+updateOwner: kma25
+updateRepo: Coursework
 updateAssetExtension: .zip
 updateHttpTimeoutSeconds: 15
