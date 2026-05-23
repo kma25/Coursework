@@ -23,7 +23,8 @@ var watcherProcess = new WatcherProcessService(settings);
 var monitoringService = new MonitoringService(monitoring, watcherProcess);
 var securityLogService = new SecurityLogService(securityLogs);
 var updateService = new UpdateService(updateSettings, settings.Version);
-var router = new CommandRouter(settings.Version, authService, noteService, adminUserService, monitoringService, securityLogService, updateService);
+var installerLaunchService = new InstallerLaunchService();
+var router = new CommandRouter(settings.Version, authService, noteService, adminUserService, monitoringService, securityLogService, updateService, installerLaunchService);
 
 Console.WriteLine("Система сопровождения ИТ-инфраструктуры");
 

@@ -15,6 +15,7 @@ public sealed class CommandRouter
     private readonly MonitoringService _monitoring;
     private readonly SecurityLogService _securityLogs;
     private readonly UpdateService _updates;
+    private readonly InstallerLaunchService _installer;
 
     /// <summary>
     /// Создает маршрутизатор команд.
@@ -26,7 +27,8 @@ public sealed class CommandRouter
         AdminUserService adminUsers,
         MonitoringService monitoring,
         SecurityLogService securityLogs,
-        UpdateService updates)
+        UpdateService updates,
+        InstallerLaunchService installer)
     {
         _version = version;
         _authService = authService;
@@ -35,6 +37,7 @@ public sealed class CommandRouter
         _monitoring = monitoring;
         _securityLogs = securityLogs;
         _updates = updates;
+        _installer = installer;
     }
 
     /// <summary>
@@ -319,7 +322,7 @@ public sealed class CommandRouter
 
         if (args[1].Equals("apply", StringComparison.OrdinalIgnoreCase) && check.Release?.HasUpdate == true)
         {
-            Console.WriteLine("Запустите AppInstaller с URL архива: " + check.Release.ZipUrl);
+            Console.WriteLine(_installer.Start(check.Release.ZipUrl ?? string.Empty).Message);
         }
     }
 
