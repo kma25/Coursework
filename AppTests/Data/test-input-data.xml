@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<testData>
+  <authorization>
+    <case name="успешная авторизация" login="admin" password="secret123" success="true" />
+    <case name="неверный пароль" login="admin" password="bad-password" success="false" />
+    <case name="пустой логин" login="" password="secret123" success="false" />
+    <case name="пустой пароль" login="admin" password="" success="false" />
+  </authorization>
+  <registration>
+    <case name="регистрация с корректными данными" login="new_user" password="secret123" role="user" success="true" />
+    <case name="регистрация с коротким паролем" login="new_user" password="123" role="user" success="false" />
+    <case name="неизвестная роль" login="new_user" password="secret123" role="owner" success="false" />
+  </registration>
+  <database>
+    <case name="проверка ролей" role="admin" />
+    <case name="строка подключения" value="Username=app_user_role;Password=pwd;" />
+    <case name="запрет postgres" username="postgres" />
+    <case name="ошибка подключения" host="bad-host" />
+  </database>
+  <notes>
+    <case name="добавление заметки" text="Проверить шлюз VPN" />
+    <case name="пустая заметка" text="" />
+    <case name="поиск" query="VPN" />
+    <case name="редактирование" text="Обновленная заметка" />
+    <case name="удаление" id="1" />
+  </notes>
+  <updates>
+    <case name="проверка обновлений" tag="v1.1.0" asset="app.zip" />
+    <case name="ответ API без zip" tag="v1.1.0" asset="readme.txt" />
+    <case name="ошибка API" status="500" />
+    <case name="параметры установщика" target="C:\Apps\ItSupport" app="MainApp.exe" />
+  </updates>
+</testData>

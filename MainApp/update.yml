@@ -1,0 +1,4 @@
+updateOwner: example-owner
+updateRepo: it-infrastructure-support
+updateAssetExtension: .zip
+updateHttpTimeoutSeconds: 15

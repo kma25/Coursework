@@ -1,0 +1,6 @@
+enabled: true
+intervalSeconds: 60
+deviceKey: dev-workstation-01
+deviceName: DEV-WORKSTATION-01
+databaseTimeoutSeconds: 10
+connectionString: Host=localhost;Port=5432;Database=it_support;Username=app_watcher_role;Password=change_me_watcher_password;
