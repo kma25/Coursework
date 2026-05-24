@@ -67,4 +67,23 @@ public sealed class ConfigurationTests
 
         Assert.IsTrue(settings.CheckUpdatesOnStartup);
     }
+
+    [TestMethod]
+    [TestCategory("Подключение к БД")]
+    public void LoadAppSettings_ReadsWatcherAutoStartFlag()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"app-{Guid.NewGuid():N}.config");
+        File.WriteAllText(path, """
+            <?xml version="1.0" encoding="utf-8" ?>
+            <configuration>
+              <appSettings>
+                <add key="AutoStartWatcher" value="false" />
+              </appSettings>
+            </configuration>
+            """);
+
+        var settings = AppConfiguration.LoadAppSettings(path);
+
+        Assert.IsFalse(settings.AutoStartWatcher);
+    }
 }

@@ -13,7 +13,7 @@ public static class AppConfiguration
     /// </summary>
     public static AppSettings LoadAppSettings(string path = "App.config")
     {
-        var values = LoadAppSettingsMap(path);
+        var values = LoadAppSettingsMap(ResolveConfigPath(path, "MainApp"));
 
         return new AppSettings
         {
@@ -26,7 +26,8 @@ public static class AppConfiguration
             UpdateConfigPath = Get(values, "UpdateConfigPath", "update.yml"),
             CheckUpdatesOnStartup = GetBool(values, "CheckUpdatesOnStartup", false),
             WatcherConfigPath = Get(values, "WatcherConfigPath", "watcher.yml"),
-            WatcherExecutablePath = Get(values, "WatcherExecutablePath", "SystemWatcher.exe")
+            WatcherExecutablePath = Get(values, "WatcherExecutablePath", "SystemWatcher.exe"),
+            AutoStartWatcher = GetBool(values, "AutoStartWatcher", true)
         };
     }
 
@@ -35,7 +36,7 @@ public static class AppConfiguration
     /// </summary>
     public static UpdateSettings LoadUpdateSettings(string path)
     {
-        var values = SimpleYamlParser.Load(path);
+        var values = SimpleYamlParser.Load(ResolveConfigPath(path, "MainApp"));
         return new UpdateSettings
         {
             UpdateOwner = SimpleYamlParser.Get(values, "updateOwner", "example"),
@@ -75,4 +76,22 @@ public static class AppConfiguration
 
     private static bool GetBool(IReadOnlyDictionary<string, string> values, string key, bool defaultValue)
         => values.TryGetValue(key, out var value) && bool.TryParse(value, out var flag) ? flag : defaultValue;
+
+    private static string ResolveConfigPath(string path, string projectDirectoryName)
+    {
+        if (Path.IsPathRooted(path))
+        {
+            return path;
+        }
+
+        var candidates = new[]
+        {
+            path,
+            Path.Combine(AppContext.BaseDirectory, path),
+            Path.Combine(Directory.GetCurrentDirectory(), path),
+            Path.Combine(Directory.GetCurrentDirectory(), projectDirectoryName, path)
+        };
+
+        return candidates.FirstOrDefault(File.Exists) ?? path;
+    }
 }

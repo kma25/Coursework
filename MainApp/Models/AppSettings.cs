@@ -58,6 +58,11 @@ public sealed class AppSettings
     public string WatcherExecutablePath { get; init; } = "SystemWatcher.exe";
 
     /// <summary>
+    /// Нужно ли запускать watcher автоматически вместе с основным приложением.
+    /// </summary>
+    public bool AutoStartWatcher { get; init; } = true;
+
+    /// <summary>
     /// Формирует строку подключения для указанной пары Username/Password.
     /// </summary>
     public string BuildConnectionString(string username, string password)

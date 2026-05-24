@@ -34,6 +34,7 @@
 - `CheckUpdatesOnStartup`
 - `WatcherConfigPath`
 - `WatcherExecutablePath`
+- `AutoStartWatcher`
 
 Host, Port и Database берутся только из App.config. Строка подключения роли содержит только `Username` и `Password`, которые возвращает функция `get_role_connection`.
 
@@ -49,6 +50,8 @@ Host, Port и Database берутся только из App.config. Строка
 - `connectionString`
 
 Параметры `runOnce`, `collectOnly`, `watch add` и `watch del` не используются: watcher сам добавляет устройство при первой отправке метрик.
+
+При `AutoStartWatcher=true` основное приложение запускает watcher автоматически в фоновом режиме. Отдельная команда `dotnet run --project SystemWatcher -- --config SystemWatcher\watcher.yml` нужна только для отладки watcher вручную.
 
 ## Команды MainApp
 

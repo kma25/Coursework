@@ -44,7 +44,7 @@ dotnet test Coursework.sln
 dotnet run --project MainApp
 ```
 
-Watcher запускается отдельно:
+Watcher запускается автоматически вместе с `MainApp`. Отдельный запуск нужен только для отладки:
 
 ```powershell
 dotnet run --project SystemWatcher -- --config SystemWatcher\watcher.yml

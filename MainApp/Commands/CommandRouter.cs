@@ -314,7 +314,7 @@ public sealed class CommandRouter
 
         var check = await _updates.CheckAsync(cancellationToken);
         Console.WriteLine(check.Result.Message);
-        if (check.Release is not null)
+        if (check.Release?.HasUpdate == true)
         {
             Console.WriteLine($"{check.Release.TagName} {check.Release.Name}");
             Console.WriteLine(check.Release.Body);
@@ -323,6 +323,10 @@ public sealed class CommandRouter
         if (args[1].Equals("apply", StringComparison.OrdinalIgnoreCase) && check.Release?.HasUpdate == true)
         {
             Console.WriteLine(_installer.Start(check.Release.ZipUrl ?? string.Empty).Message);
+        }
+        else if (args[1].Equals("apply", StringComparison.OrdinalIgnoreCase) && check.Result.Success)
+        {
+            Console.WriteLine("Установка не требуется: текущая версия уже актуальна.");
         }
     }
 

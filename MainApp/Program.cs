@@ -39,7 +39,14 @@ catch (Exception ex)
     Console.WriteLine($"Ошибка чтения настроек подключения: {ex.Message}");
 }
 
-Console.WriteLine(watcherProcess.StartIfNeeded().Message);
+if (settings.AutoStartWatcher)
+{
+    Console.WriteLine(watcherProcess.StartIfNeeded().Message);
+}
+else
+{
+    Console.WriteLine("Автоматический запуск watcher отключен в App.config.");
+}
 
 if (settings.CheckUpdatesOnStartup)
 {
