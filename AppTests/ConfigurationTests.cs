@@ -86,6 +86,29 @@ public sealed class ConfigurationTests
     }
 
     /// <summary>
+    /// Проверяет, что поставляемый с проектом App.config включает проверку обновлений при запуске.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("Конфигурация")]
+    public void MainAppConfig_EnablesStartupUpdateCheckByDefault()
+    {
+        var configPath = Path.GetFullPath(Path.Combine(
+            AppContext.BaseDirectory,
+            "..",
+            "..",
+            "..",
+            "..",
+            "MainApp",
+            "App.config"));
+
+        Assert.IsTrue(File.Exists(configPath), "Не найден основной App.config проекта MainApp.");
+
+        var settings = AppConfiguration.LoadAppSettings(configPath);
+
+        Assert.IsTrue(settings.CheckUpdatesOnStartup);
+    }
+
+    /// <summary>
     /// Проверяет, что автоматический запуск watcher можно отключить настройкой App.config.
     /// </summary>
     [TestMethod]

@@ -50,4 +50,6 @@ Watcher запускается автоматически вместе с `MainA
 dotnet run --project SystemWatcher -- --config SystemWatcher\watcher.yml
 ```
 
+При запуске `MainApp` сразу проверяет GitHub Releases и сообщает, есть ли доступная версия для обновления.
+
 Подробная инструкция по pgAdmin находится в `docs/PGADMIN_SETUP.md`.
