@@ -1,46 +1,260 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <testData>
-  <authorization>
-    <case name="успешная авторизация" login="admin" password="secret123" success="true" />
-    <case name="неверный пароль" login="admin" password="bad-password" success="false" />
-  </authorization>
-  <registration>
-    <case name="регистрация с корректными данными" login="new_user" password="secret123" role="user" success="true" />
-    <case name="регистрация с коротким паролем" login="new_user" password="123" role="user" success="false" />
-    <case name="неизвестная роль" login="new_user" password="secret123" role="owner" success="false" />
-  </registration>
-  <database>
-    <case name="проверка ролей" role="admin" />
-    <case name="рабочая база" database="Coursework tester" />
-    <case name="тестовая база" database="Coursework test bsses" />
-    <case name="строка подключения" value="Username=app_user_role;Password=pwd;" />
-    <case name="запрет postgres" username="postgres" />
-    <case name="ошибка подключения" host="bad-host" />
-  </database>
-  <notes>
-    <case name="добавление заметки" text="Проверить шлюз VPN" />
-    <case name="пустая заметка" text="" />
-    <case name="поиск" query="VPN" />
-    <case name="редактирование" text="Обновленная заметка" />
-    <case name="удаление" id="1" />
-  </notes>
-  <roleAccess>
-    <case name="statisticianCanViewMonitoring" role="statistician" deviceName="DEV-WORKSTATION-01" metricsCount="3" success="true" />
-    <case name="userCannotViewMonitoring" role="user" deviceName="DEV-WORKSTATION-01" metricsCount="3" success="false" />
-    <case name="statisticianCannotAddNote" role="statistician" text="Служебная заметка статистика" success="false" />
-    <case name="statisticianCannotEditNote" role="statistician" ownerId="1" noteText="Заметка пользователя" newText="Попытка изменения статистиком" success="false" />
-    <case name="statisticianCannotDeleteNote" role="statistician" ownerId="1" noteText="Заметка для удаления" success="false" />
-    <case name="userCannotEditForeignNote" actorRole="user" ownerId="1" actorId="2" noteText="Чужая заметка" newText="Чужое изменение" success="false" />
-    <case name="adminCanEditForeignNote" actorRole="admin" ownerId="1" actorId="99" noteText="Заметка пользователя" newText="Исправлено администратором" success="true" />
-    <case name="adminCanDeleteForeignNote" actorRole="admin" ownerId="1" actorId="99" noteText="Заметка на удаление" success="true" />
-    <case name="statisticianCannotUseAdminUsers" role="statistician" login="observer" password="secret123" newRole="user" success="false" />
-    <case name="adminCanCreateUser" role="admin" login="operator" password="secret123" newRole="user" success="true" />
-  </roleAccess>
-  <updates>
-    <case name="проверка обновлений" tag="v1.1.0" asset="app.zip" />
-    <case name="ответ API без zip" tag="v1.1.0" asset="readme.txt" />
-    <case name="ошибка API" status="500" />
-    <case name="лимит GitHub API" status="403" message="API rate limit exceeded" resetMinutes="30" />
-    <case name="параметры установщика" target="C:\Apps\Coursework" app="MainApp.exe" />
-  </updates>
+  <settings databaseHost="localhost"
+            databasePort="5432"
+            databaseName="Coursework test bsses"
+            authUsername="app_auth"
+            authPassword="auth_pwd"
+            updateHttpTimeoutSeconds="5"
+            roleConnectionTemplate="Host=localhost;Username=app_{role}_role;Password=pwd" />
+
+  <authorizationLogin>
+    <case name="admin входит с верным паролем"
+          login="admin"
+          password="secret123"
+          seedLogin="admin"
+          seedPassword="secret123"
+          seedRole="admin"
+          seedBlocked="false"
+          expectedSuccess="true"
+          expectedRole="admin"
+          expectedMessage="Вход выполнен успешно." />
+    <case name="user входит с верным паролем"
+          login="operator"
+          password="user123"
+          seedLogin="operator"
+          seedPassword="user123"
+          seedRole="user"
+          seedBlocked="false"
+          expectedSuccess="true"
+          expectedRole="user"
+          expectedMessage="Вход выполнен успешно." />
+    <case name="заблокированный пользователь не входит"
+          login="blocked"
+          password="lock123"
+          seedLogin="blocked"
+          seedPassword="lock123"
+          seedRole="user"
+          seedBlocked="true"
+          expectedSuccess="false"
+          expectedRole=""
+          expectedMessage="Учетная запись заблокирована." />
+    <case name="неверный пароль отклоняется"
+          login="admin"
+          password="bad-password"
+          seedLogin="admin"
+          seedPassword="secret123"
+          seedRole="admin"
+          seedBlocked="false"
+          expectedSuccess="false"
+          expectedRole=""
+          expectedMessage="Неверный логин или пароль." />
+  </authorizationLogin>
+
+  <authorizationRegistration>
+    <case name="первый пользователь получает admin"
+          login="kirill"
+          password="secret123"
+          role="user"
+          seedExistingUser="false"
+          expectedSuccess="true"
+          expectedCreatedRole="admin"
+          expectedMessage="Первый пользователь создан с ролью admin." />
+    <case name="статистик создается с ролью statistician"
+          login="observer"
+          password="observer123"
+          role="statistician"
+          seedExistingUser="true"
+          expectedSuccess="true"
+          expectedCreatedRole="statistician"
+          expectedMessage="Регистрация выполнена успешно." />
+    <case name="короткий пароль отклоняется"
+          login="short_pwd"
+          password="123"
+          role="user"
+          seedExistingUser="true"
+          expectedSuccess="false"
+          expectedCreatedRole=""
+          expectedMessage="Пароль должен содержать не менее 6 символов." />
+  </authorizationRegistration>
+
+  <notesAdd>
+    <case name="пользователь добавляет заметку"
+          actorRole="user"
+          actorId="1"
+          text="Проверить VPN-шлюз"
+          expectedSuccess="true"
+          expectedSavedText="Проверить VPN-шлюз"
+          expectedMessage="Заметка добавлена." />
+    <case name="пустая заметка не сохраняется"
+          actorRole="user"
+          actorId="1"
+          text=""
+          expectedSuccess="false"
+          expectedSavedText=""
+          expectedMessage="Нельзя добавить пустую заметку." />
+    <case name="статистик не добавляет заметку"
+          actorRole="statistician"
+          actorId="2"
+          text="Служебная заметка"
+          expectedSuccess="false"
+          expectedSavedText=""
+          expectedMessage="Заметки недоступны роли statistician." />
+  </notesAdd>
+
+  <notesEdit>
+    <case name="владелец редактирует свою заметку"
+          ownerId="1"
+          actorId="1"
+          actorRole="user"
+          noteText="Исходная заметка"
+          newText="Обновленная заметка"
+          expectedSuccess="true"
+          expectedMessage="Заметка изменена." />
+    <case name="обычный пользователь не редактирует чужую заметку"
+          ownerId="1"
+          actorId="2"
+          actorRole="user"
+          noteText="Чужая заметка"
+          newText="Попытка изменения"
+          expectedSuccess="false"
+          expectedMessage="Нельзя изменить чужую заметку." />
+    <case name="администратор редактирует чужую заметку"
+          ownerId="1"
+          actorId="99"
+          actorRole="admin"
+          noteText="Заметка пользователя"
+          newText="Исправлено администратором"
+          expectedSuccess="true"
+          expectedMessage="Заметка изменена." />
+    <case name="статистик не редактирует заметки"
+          ownerId="1"
+          actorId="3"
+          actorRole="statistician"
+          noteText="Заметка пользователя"
+          newText="Попытка статистика"
+          expectedSuccess="false"
+          expectedMessage="Заметки недоступны роли statistician." />
+  </notesEdit>
+
+  <databaseConnection>
+    <case name="auth подключение собирается из App.config"
+          mode="direct"
+          host="localhost"
+          port="5432"
+          database="Coursework test bsses"
+          username="app_auth"
+          password="auth_pwd"
+          expectedSuccess="true"
+          expectedContains="Host=localhost;Port=5432;Database=Coursework test bsses;Username=app_auth" />
+    <case name="роль user дополняется параметрами базы"
+          mode="roleFragment"
+          host="127.0.0.1"
+          port="5432"
+          database="Coursework tester"
+          roleFragment="Username=app_user_role;Password=user_pwd"
+          expectedSuccess="true"
+          expectedContains="Host=127.0.0.1;Port=5432;Database=Coursework tester;Username=app_user_role" />
+    <case name="postgres запрещен для рабочих операций"
+          mode="direct"
+          host="localhost"
+          port="5432"
+          database="Coursework tester"
+          username="postgres"
+          password="postgres"
+          expectedSuccess="false"
+          expectedContains="postgres" />
+  </databaseConnection>
+
+  <gitUpdates>
+    <case name="новая версия найдена в Assets"
+          status="200"
+          currentVersion="1.0.0"
+          updateOwner="kma25"
+          updateRepo="Coursework"
+          assetExtension=".zip"
+          timeoutSeconds="5"
+          expectedSuccess="true"
+          expectedReleaseExists="true"
+          expectedHasUpdate="true"
+          expectedZipUrl="https://example.test/MainApp.zip"
+          expectedMessage="Найдена новая версия приложения.">
+      <response><![CDATA[
+{
+  "tag_name": "v1.1.0",
+  "name": "Release 1.1.0",
+  "body": "Готовая сборка приложения",
+  "assets": [
+    { "name": "MainApp.zip", "browser_download_url": "https://example.test/MainApp.zip" }
+  ]
+}
+      ]]></response>
+    </case>
+    <case name="текущая версия уже актуальна"
+          status="200"
+          currentVersion="1.1.0"
+          updateOwner="kma25"
+          updateRepo="Coursework"
+          assetExtension=".zip"
+          timeoutSeconds="5"
+          expectedSuccess="true"
+          expectedReleaseExists="true"
+          expectedHasUpdate="false"
+          expectedZipUrl="https://example.test/MainApp.zip"
+          expectedMessage="Обновления не найдены.">
+      <response><![CDATA[
+{
+  "tag_name": "v1.1.0",
+  "name": "Release 1.1.0",
+  "body": "Версия без изменений",
+  "assets": [
+    { "name": "MainApp.zip", "browser_download_url": "https://example.test/MainApp.zip" }
+  ]
+}
+      ]]></response>
+    </case>
+    <case name="source zip не считается сборкой"
+          status="200"
+          currentVersion="1.0.0"
+          updateOwner="kma25"
+          updateRepo="Coursework"
+          assetExtension=".zip"
+          timeoutSeconds="5"
+          expectedSuccess="false"
+          expectedReleaseExists="true"
+          expectedHasUpdate="false"
+          expectedZipUrl=""
+          expectedMessage="ZIP-архив сборки">
+      <response><![CDATA[
+{
+  "tag_name": "v1.1.0",
+  "name": "Release 1.1.0",
+  "body": "Нет готового архива",
+  "zipball_url": "https://example.test/source-code.zip",
+  "assets": [
+    { "name": "readme.txt", "browser_download_url": "https://example.test/readme.txt" }
+  ]
+}
+      ]]></response>
+    </case>
+    <case name="лимит GitHub API обрабатывается понятно"
+          status="403"
+          currentVersion="1.0.0"
+          updateOwner="kma25"
+          updateRepo="Coursework"
+          assetExtension=".zip"
+          timeoutSeconds="5"
+          rateLimitResetMinutes="30"
+          expectedSuccess="false"
+          expectedReleaseExists="false"
+          expectedHasUpdate="false"
+          expectedZipUrl=""
+          expectedMessage="GitHub временно ограничил">
+      <response><![CDATA[
+{
+  "message": "API rate limit exceeded"
+}
+      ]]></response>
+    </case>
+  </gitUpdates>
 </testData>

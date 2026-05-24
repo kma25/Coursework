@@ -4,43 +4,45 @@ using MainApp.Models;
 namespace AppTests
 {
     /// <summary>
-    /// Загружает XML-наборы данных, которые используются параметризованными и сценарными unit-тестами.
+    /// Загружает XML-наборы данных для unit-тестов и преобразует атрибуты в нужные типы.
     /// </summary>
     internal static class XmlTestData
     {
         /// <summary>
-        /// Возвращает набор логинов и паролей для единого теста авторизации.
+        /// Возвращает наборы для проверки входа пользователей.
         /// </summary>
-        public static IEnumerable<object[]> AuthorizationCases()
-        {
-            return LoadDocument().Root!
-                .Element("authorization")!
-                .Elements("case")
-                .Select(element => new object[]
-                {
-                    element.Attribute("name")!.Value,
-                    element.Attribute("login")!.Value,
-                    element.Attribute("password")!.Value,
-                    bool.Parse(element.Attribute("success")!.Value)
-                });
-        }
+        public static IEnumerable<object[]> AuthorizationLoginCases()
+            => Rows("authorizationLogin");
 
         /// <summary>
-        /// Находит один именованный тест-кейс внутри указанной группы XML-данных.
+        /// Возвращает наборы для проверки регистрации пользователей.
         /// </summary>
-        /// <param name="groupName">Имя XML-группы: например, authorization, notes или roleAccess.</param>
-        /// <param name="caseName">Значение атрибута name у конкретного тест-кейса.</param>
-        /// <returns>XML-элемент с параметрами теста.</returns>
-        /// <exception cref="InvalidOperationException">Возникает, если группа или тест-кейс отсутствует.</exception>
-        public static XElement Case(string groupName, string caseName)
-        {
-            var group = LoadDocument().Root!.Element(groupName)
-                ?? throw new InvalidOperationException($"Группа тестовых данных не найдена: {groupName}.");
+        public static IEnumerable<object[]> AuthorizationRegistrationCases()
+            => Rows("authorizationRegistration");
 
-            return group.Elements("case")
-                .FirstOrDefault(element => Attribute(element, "name") == caseName)
-                ?? throw new InvalidOperationException($"Тест-кейс не найден: {groupName}/{caseName}.");
-        }
+        /// <summary>
+        /// Возвращает наборы для проверки добавления заметок.
+        /// </summary>
+        public static IEnumerable<object[]> NoteAddCases()
+            => Rows("notesAdd");
+
+        /// <summary>
+        /// Возвращает наборы для проверки редактирования заметок.
+        /// </summary>
+        public static IEnumerable<object[]> NoteEditCases()
+            => Rows("notesEdit");
+
+        /// <summary>
+        /// Возвращает наборы для проверки строк подключения к базе данных.
+        /// </summary>
+        public static IEnumerable<object[]> DatabaseConnectionCases()
+            => Rows("databaseConnection");
+
+        /// <summary>
+        /// Возвращает наборы для проверки обновлений через GitHub Releases.
+        /// </summary>
+        public static IEnumerable<object[]> GitUpdateCases()
+            => Rows("gitUpdates");
 
         /// <summary>
         /// Читает обязательный строковый атрибут XML-кейса.
@@ -50,10 +52,22 @@ namespace AppTests
                 ?? throw new InvalidOperationException($"В тестовых данных не задан атрибут {name}.");
 
         /// <summary>
+        /// Читает необязательный строковый атрибут XML-кейса.
+        /// </summary>
+        public static string OptionalAttribute(XElement element, string name)
+            => element.Attribute(name)?.Value ?? string.Empty;
+
+        /// <summary>
         /// Читает обязательный целочисленный атрибут XML-кейса.
         /// </summary>
         public static int IntAttribute(XElement element, string name)
             => int.Parse(Attribute(element, name));
+
+        /// <summary>
+        /// Читает необязательный целочисленный атрибут XML-кейса.
+        /// </summary>
+        public static int OptionalIntAttribute(XElement element, string name, int fallback)
+            => int.TryParse(OptionalAttribute(element, name), out var value) ? value : fallback;
 
         /// <summary>
         /// Читает обязательный логический атрибут XML-кейса.
@@ -68,6 +82,40 @@ namespace AppTests
             => UserRoleExtensions.TryParseRole(Attribute(element, name), out var role)
                 ? role
                 : throw new InvalidOperationException($"В тестовых данных указана неизвестная роль: {Attribute(element, name)}.");
+
+        /// <summary>
+        /// Возвращает JSON/XML-текст, вложенный в тестовый кейс.
+        /// </summary>
+        public static string ElementText(XElement element, string name)
+            => element.Element(name)?.Value.Trim()
+                ?? throw new InvalidOperationException($"В тестовых данных не найден элемент {name}.");
+
+        /// <summary>
+        /// Читает общий параметр тестовой среды из корневого XML-файла.
+        /// </summary>
+        public static string Setting(string name)
+            => LoadDocument().Root!.Element("settings")?.Attribute(name)?.Value
+                ?? throw new InvalidOperationException($"В тестовых настройках не задан параметр {name}.");
+
+        /// <summary>
+        /// Читает общий целочисленный параметр тестовой среды.
+        /// </summary>
+        public static int IntSetting(string name)
+            => int.Parse(Setting(name));
+
+        private static IEnumerable<object[]> Rows(string groupName)
+        {
+            var group = LoadDocument().Root!.Element(groupName)
+                ?? throw new InvalidOperationException($"Группа тестовых данных не найдена: {groupName}.");
+
+            return group.Elements("case")
+                .Select(element => new object[]
+                {
+                    Attribute(element, "name"),
+                    element
+                })
+                .ToArray();
+        }
 
         private static XDocument LoadDocument()
             => XDocument.Load(Path.Combine(AppContext.BaseDirectory, "Data", "test-input-data.xml"));
