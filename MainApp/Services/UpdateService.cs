@@ -51,12 +51,18 @@ public sealed class UpdateService
             var tagName = GetString(root, "tag_name");
             var name = GetString(root, "name");
             var body = GetString(root, "body");
-            var zipUrl = FindAssetUrl(root, _settings.UpdateAssetExtension) ?? FindSourceArchiveUrl(root, _settings.UpdateAssetExtension);
-            var hasUpdate = IsNewerVersion(_currentVersion, tagName) && zipUrl is not null;
+            var zipUrl = FindAssetUrl(root, _settings.UpdateAssetExtension);
+            var isNewerVersion = IsNewerVersion(_currentVersion, tagName);
+            var hasUpdate = isNewerVersion && zipUrl is not null;
 
             var release = new UpdateRelease(hasUpdate, tagName, name, body, zipUrl);
-            return hasUpdate
-                ? (OperationResult.Ok("Найдена новая версия приложения."), release)
+            if (hasUpdate)
+            {
+                return (OperationResult.Ok("Найдена новая версия приложения."), release);
+            }
+
+            return isNewerVersion
+                ? (OperationResult.Fail("Найдена новая версия, но к релизу не прикреплен ZIP-архив сборки."), release)
                 : (OperationResult.Ok("Обновления не найдены."), release);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException or JsonException)
@@ -137,18 +143,6 @@ public sealed class UpdateService
         }
 
         return null;
-    }
-
-    private static string? FindSourceArchiveUrl(JsonElement root, string extension)
-    {
-        if (!extension.Equals(".zip", StringComparison.OrdinalIgnoreCase))
-        {
-            return null;
-        }
-
-        return root.TryGetProperty("zipball_url", out var value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
     }
 
     private static bool IsNewerVersion(string currentVersion, string candidateVersion)

@@ -32,13 +32,14 @@ public sealed class UpdateServiceTests
 
     [TestMethod]
     [TestCategory("Обновления")]
-    public async Task CheckAsync_ReturnsNoUpdateWhenApiHasNoZip()
+    public async Task CheckAsync_DoesNotUseSourceZipWhenApiHasNoAsset()
     {
         var json = """
             {
               "tag_name": "v1.1.0",
               "name": "Release 1.1.0",
               "body": "Без архива",
+              "zipball_url": "https://example.test/source-code.zip",
               "assets": [
                 { "name": "readme.txt", "browser_download_url": "https://example.test/readme.txt" }
               ]
@@ -48,8 +49,10 @@ public sealed class UpdateServiceTests
 
         var result = await service.CheckAsync();
 
-        Assert.IsTrue(result.Result.Success);
+        Assert.IsFalse(result.Result.Success);
         Assert.IsFalse(result.Release!.HasUpdate);
+        Assert.IsNull(result.Release.ZipUrl);
+        StringAssert.Contains(result.Result.Message, "ZIP-архив сборки");
     }
 
     [TestMethod]

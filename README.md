@@ -33,7 +33,7 @@ Coursework/
 2. Выполнить тот же скрипт в запасной тестовой базе `Coursework test bsses`.
 3. Проверить пароли ролей в SQL, `MainApp/App.config` и `SystemWatcher/watcher.yml`.
 4. Запустить `MainApp` и зарегистрировать первого пользователя: он автоматически станет `admin`.
-5. При необходимости настроить `MainApp/update.yml` на реальные GitHub Releases и проверять обновления командой `update check`.
+5. При необходимости настроить `MainApp/update.yml` на реальные GitHub Releases и прикрепить готовую сборку ZIP в `Assets` релиза.
 6. Оформить пояснительную записку по структуре из `docs/COURSEWORK_STRUCTURE_NOTES.md`.
 
 ## Быстрый запуск
