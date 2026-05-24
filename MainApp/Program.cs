@@ -41,8 +41,11 @@ catch (Exception ex)
 
 Console.WriteLine(watcherProcess.StartIfNeeded().Message);
 
-var updateCheck = await updateService.CheckAsync();
-Console.WriteLine(updateCheck.Result.Message);
+if (settings.CheckUpdatesOnStartup)
+{
+    var updateCheck = await updateService.CheckAsync();
+    Console.WriteLine(updateCheck.Result.Message);
+}
 
 while (true)
 {

@@ -64,11 +64,38 @@ public sealed class UpdateServiceTests
         Assert.IsNull(result.Release);
     }
 
-    private static UpdateService CreateService(string response, HttpStatusCode statusCode)
+    [TestMethod]
+    [TestCategory("Обновления")]
+    public async Task CheckAsync_ExplainsGitHubRateLimit()
     {
-        var handler = new FakeHttpMessageHandler(_ => new HttpResponseMessage(statusCode)
+        var json = """{ "message": "API rate limit exceeded" }""";
+        var resetAt = DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds().ToString();
+        var service = CreateService(json, HttpStatusCode.Forbidden, message =>
         {
-            Content = new StringContent(response)
+            message.Headers.Add("X-RateLimit-Reset", resetAt);
+        });
+
+        var result = await service.CheckAsync();
+
+        Assert.IsFalse(result.Result.Success);
+        Assert.IsNull(result.Release);
+        StringAssert.Contains(result.Result.Message, "GitHub временно ограничил");
+        StringAssert.Contains(result.Result.Message, "update check");
+    }
+
+    private static UpdateService CreateService(
+        string response,
+        HttpStatusCode statusCode,
+        Action<HttpResponseMessage>? configureResponse = null)
+    {
+        var handler = new FakeHttpMessageHandler(_ =>
+        {
+            var message = new HttpResponseMessage(statusCode)
+            {
+                Content = new StringContent(response)
+            };
+            configureResponse?.Invoke(message);
+            return message;
         });
 
         var settings = new UpdateSettings

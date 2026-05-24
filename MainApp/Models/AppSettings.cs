@@ -43,6 +43,11 @@ public sealed class AppSettings
     public string UpdateConfigPath { get; init; } = "update.yml";
 
     /// <summary>
+    /// Нужно ли автоматически проверять GitHub Releases при запуске приложения.
+    /// </summary>
+    public bool CheckUpdatesOnStartup { get; init; }
+
+    /// <summary>
     /// Путь к YAML-файлу watcher.
     /// </summary>
     public string WatcherConfigPath { get; init; } = "watcher.yml";

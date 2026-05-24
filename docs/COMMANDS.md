@@ -31,6 +31,7 @@
 - `AuthPassword`
 - `Version`
 - `UpdateConfigPath`
+- `CheckUpdatesOnStartup`
 - `WatcherConfigPath`
 - `WatcherExecutablePath`
 
@@ -112,6 +113,8 @@ update apply
 - `updateHttpTimeoutSeconds`
 
 `update check` обращается к GitHub Releases API, читает `tag_name`, `name`, `body`, `assets`, ищет ZIP-архив и сравнивает версию с текущей.
+
+По умолчанию `CheckUpdatesOnStartup=false`, поэтому GitHub не проверяется при каждом запуске приложения. Это защищает демонстрацию от лишних сообщений про лимит GitHub API; проверку лучше запускать вручную командой `update check`.
 
 `AppInstaller` можно запустить отдельно:
 

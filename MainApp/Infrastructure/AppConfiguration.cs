@@ -24,6 +24,7 @@ public static class AppConfiguration
             AuthPassword = Get(values, "AuthPassword", "change_me"),
             Version = Get(values, "Version", "1.0.0"),
             UpdateConfigPath = Get(values, "UpdateConfigPath", "update.yml"),
+            CheckUpdatesOnStartup = GetBool(values, "CheckUpdatesOnStartup", false),
             WatcherConfigPath = Get(values, "WatcherConfigPath", "watcher.yml"),
             WatcherExecutablePath = Get(values, "WatcherExecutablePath", "SystemWatcher.exe")
         };
@@ -71,4 +72,7 @@ public static class AppConfiguration
 
     private static int GetInt(IReadOnlyDictionary<string, string> values, string key, int defaultValue)
         => values.TryGetValue(key, out var value) && int.TryParse(value, out var number) ? number : defaultValue;
+
+    private static bool GetBool(IReadOnlyDictionary<string, string> values, string key, bool defaultValue)
+        => values.TryGetValue(key, out var value) && bool.TryParse(value, out var flag) ? flag : defaultValue;
 }

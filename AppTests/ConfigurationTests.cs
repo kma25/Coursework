@@ -48,4 +48,23 @@ public sealed class ConfigurationTests
         Assert.AreEqual("demo", SimpleYamlParser.Get(values, "updateOwner", ""));
         Assert.AreEqual(7, SimpleYamlParser.GetInt(values, "updateHttpTimeoutSeconds", 0));
     }
+
+    [TestMethod]
+    [TestCategory("Подключение к БД")]
+    public void LoadAppSettings_ReadsStartupUpdateFlag()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"app-{Guid.NewGuid():N}.config");
+        File.WriteAllText(path, """
+            <?xml version="1.0" encoding="utf-8" ?>
+            <configuration>
+              <appSettings>
+                <add key="CheckUpdatesOnStartup" value="true" />
+              </appSettings>
+            </configuration>
+            """);
+
+        var settings = AppConfiguration.LoadAppSettings(path);
+
+        Assert.IsTrue(settings.CheckUpdatesOnStartup);
+    }
 }
