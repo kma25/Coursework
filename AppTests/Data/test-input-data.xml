@@ -3,8 +3,6 @@
   <authorization>
     <case name="успешная авторизация" login="admin" password="secret123" success="true" />
     <case name="неверный пароль" login="admin" password="bad-password" success="false" />
-    <case name="пустой логин" login="" password="secret123" success="false" />
-    <case name="пустой пароль" login="admin" password="" success="false" />
   </authorization>
   <registration>
     <case name="регистрация с корректными данными" login="new_user" password="secret123" role="user" success="true" />

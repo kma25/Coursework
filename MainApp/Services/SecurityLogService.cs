@@ -1,37 +1,38 @@
 using MainApp.Infrastructure.Repositories;
 using MainApp.Models;
 
-namespace MainApp.Services;
-
-/// <summary>
-/// Отдает журнал безопасности с проверкой роли.
-/// </summary>
-public sealed class SecurityLogService
+namespace MainApp.Services
 {
-    private readonly ISecurityLogRepository _securityLogs;
-
     /// <summary>
-    /// Создает сервис журнала безопасности.
+    /// Отдает журнал безопасности с проверкой роли.
     /// </summary>
-    public SecurityLogService(ISecurityLogRepository securityLogs)
+    public sealed class SecurityLogService
     {
-        _securityLogs = securityLogs;
-    }
+        private readonly ISecurityLogRepository _securityLogs;
 
-    /// <summary>
-    /// Возвращает последние события безопасности.
-    /// </summary>
-    public async Task<(OperationResult Result, IReadOnlyList<SecurityLogEntry> Logs)> GetRecentAsync(
-        UserSession session,
-        int count,
-        CancellationToken cancellationToken = default)
-    {
-        if (session.User.Role != UserRole.Admin)
+        /// <summary>
+        /// Создает сервис журнала безопасности.
+        /// </summary>
+        public SecurityLogService(ISecurityLogRepository securityLogs)
         {
-            return (OperationResult.Fail("Журнал безопасности доступен только администратору."), Array.Empty<SecurityLogEntry>());
+            _securityLogs = securityLogs;
         }
 
-        var logs = await _securityLogs.GetRecentAsync(Math.Clamp(count, 1, 200), session.RoleConnectionString, cancellationToken);
-        return (OperationResult.Ok("Журнал безопасности получен."), logs);
+        /// <summary>
+        /// Возвращает последние события безопасности.
+        /// </summary>
+        public async Task<(OperationResult Result, IReadOnlyList<SecurityLogEntry> Logs)> GetRecentAsync(
+            UserSession session,
+            int count,
+            CancellationToken cancellationToken = default)
+        {
+            if (session.User.Role != UserRole.Admin)
+            {
+                return (OperationResult.Fail("Журнал безопасности доступен только администратору."), Array.Empty<SecurityLogEntry>());
+            }
+
+            var logs = await _securityLogs.GetRecentAsync(Math.Clamp(count, 1, 200), session.RoleConnectionString, cancellationToken);
+            return (OperationResult.Ok("Журнал безопасности получен."), logs);
+        }
     }
 }
