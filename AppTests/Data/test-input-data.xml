@@ -26,10 +26,23 @@
     <case name="редактирование" text="Обновленная заметка" />
     <case name="удаление" id="1" />
   </notes>
+  <roleAccess>
+    <case name="statisticianCanViewMonitoring" role="statistician" deviceName="DEV-WORKSTATION-01" metricsCount="3" success="true" />
+    <case name="userCannotViewMonitoring" role="user" deviceName="DEV-WORKSTATION-01" metricsCount="3" success="false" />
+    <case name="statisticianCannotAddNote" role="statistician" text="Служебная заметка статистика" success="false" />
+    <case name="statisticianCannotEditNote" role="statistician" ownerId="1" noteText="Заметка пользователя" newText="Попытка изменения статистиком" success="false" />
+    <case name="statisticianCannotDeleteNote" role="statistician" ownerId="1" noteText="Заметка для удаления" success="false" />
+    <case name="userCannotEditForeignNote" actorRole="user" ownerId="1" actorId="2" noteText="Чужая заметка" newText="Чужое изменение" success="false" />
+    <case name="adminCanEditForeignNote" actorRole="admin" ownerId="1" actorId="99" noteText="Заметка пользователя" newText="Исправлено администратором" success="true" />
+    <case name="adminCanDeleteForeignNote" actorRole="admin" ownerId="1" actorId="99" noteText="Заметка на удаление" success="true" />
+    <case name="statisticianCannotUseAdminUsers" role="statistician" login="observer" password="secret123" newRole="user" success="false" />
+    <case name="adminCanCreateUser" role="admin" login="operator" password="secret123" newRole="user" success="true" />
+  </roleAccess>
   <updates>
     <case name="проверка обновлений" tag="v1.1.0" asset="app.zip" />
     <case name="ответ API без zip" tag="v1.1.0" asset="readme.txt" />
     <case name="ошибка API" status="500" />
+    <case name="лимит GitHub API" status="403" message="API rate limit exceeded" resetMinutes="30" />
     <case name="параметры установщика" target="C:\Apps\Coursework" app="MainApp.exe" />
   </updates>
 </testData>

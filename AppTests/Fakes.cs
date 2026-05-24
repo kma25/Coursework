@@ -112,6 +112,27 @@ internal sealed class InMemorySecurityLogRepository : ISecurityLogRepository
         => Task.FromResult<IReadOnlyList<SecurityLogEntry>>(_logs.OrderByDescending(log => log.CreatedAt).Take(count).ToArray());
 }
 
+internal sealed class InMemoryMonitoringRepository : IMonitoringRepository
+{
+    private readonly List<MonitoredDevice> _devices =
+    [
+        new(1, "dev-workstation-01", "DEV-WORKSTATION-01", DateTime.UtcNow)
+    ];
+
+    private readonly List<SystemMetric> _metrics =
+    [
+        new(1, 1, 10.5, 42.0, 80.1, DateTime.UtcNow.AddMinutes(-2)),
+        new(2, 1, 11.0, 43.0, 80.2, DateTime.UtcNow.AddMinutes(-1)),
+        new(3, 1, 12.0, 44.0, 80.3, DateTime.UtcNow)
+    ];
+
+    public Task<IReadOnlyList<MonitoredDevice>> GetDevicesAsync(string connectionString, CancellationToken cancellationToken = default)
+        => Task.FromResult<IReadOnlyList<MonitoredDevice>>(_devices.ToArray());
+
+    public Task<IReadOnlyList<SystemMetric>> GetMetricsAsync(string deviceName, int count, string connectionString, CancellationToken cancellationToken = default)
+        => Task.FromResult<IReadOnlyList<SystemMetric>>(_metrics.Take(count).ToArray());
+}
+
 internal sealed class FakeHttpMessageHandler : HttpMessageHandler
 {
     private readonly Func<HttpRequestMessage, HttpResponseMessage> _handle;

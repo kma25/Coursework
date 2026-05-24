@@ -126,15 +126,35 @@ public sealed class AppSettings
 /// </summary>
 public sealed class UpdateSettings
 {
+    /// <summary>
+    /// Владелец GitHub-репозитория, в котором публикуются релизы.
+    /// </summary>
     public string UpdateOwner { get; init; } = "example";
+
+    /// <summary>
+    /// Имя GitHub-репозитория с релизами приложения.
+    /// </summary>
     public string UpdateRepo { get; init; } = "it-support";
+
+    /// <summary>
+    /// Расширение файла сборки, который должен быть прикреплен к релизу.
+    /// </summary>
     public string UpdateAssetExtension { get; init; } = ".zip";
+
+    /// <summary>
+    /// Максимальное время ожидания ответа GitHub API.
+    /// </summary>
     public int UpdateHttpTimeoutSeconds { get; init; } = 15;
 }
 
 /// <summary>
 /// Информация о релизе, найденном через HTTP API.
 /// </summary>
+/// <param name="HasUpdate">Показывает, является ли найденный релиз новее текущей версии и готов ли он к установке.</param>
+/// <param name="TagName">Git-тег релиза, например v1.0.1.</param>
+/// <param name="Name">Человекочитаемое название релиза.</param>
+/// <param name="Body">Описание релиза из GitHub Releases.</param>
+/// <param name="ZipUrl">Прямая ссылка на ZIP-архив сборки из блока Assets.</param>
 public sealed record UpdateRelease(
     bool HasUpdate,
     string TagName,

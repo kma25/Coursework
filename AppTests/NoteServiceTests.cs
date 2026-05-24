@@ -3,51 +3,66 @@ using MainApp.Services;
 
 namespace AppTests;
 
+/// <summary>
+/// Проверяет прикладные правила работы с пользовательскими заметками без подключения к PostgreSQL.
+/// </summary>
 [TestClass]
 public sealed class NoteServiceTests
 {
+    /// <summary>
+    /// Проверяет, что пустой текст из XML-набора данных не сохраняется как заметка.
+    /// </summary>
     [TestMethod]
     [TestCategory("Заметки")]
     public async Task AddAsync_RejectsEmptyNote()
     {
+        var data = XmlTestData.Case("notes", "пустая заметка");
         var service = new NoteService(new InMemoryNoteRepository());
         var session = UserSession(1, UserRole.User);
 
-        var result = await service.AddAsync(session, "   ");
+        var result = await service.AddAsync(session, XmlTestData.Attribute(data, "text"));
 
         Assert.IsFalse(result.Result.Success);
         StringAssert.Contains(result.Result.Message, "пустую заметку");
     }
 
+    /// <summary>
+    /// Проверяет запрет на изменение заметки, принадлежащей другому обычному пользователю.
+    /// </summary>
     [TestMethod]
     [TestCategory("Заметки")]
     public async Task EditAsync_RejectsForeignNoteForRegularUser()
     {
+        var data = XmlTestData.Case("roleAccess", "userCannotEditForeignNote");
         var repository = new InMemoryNoteRepository();
         var service = new NoteService(repository);
-        var owner = UserSession(1, UserRole.User);
-        var another = UserSession(2, UserRole.User);
-        var created = await service.AddAsync(owner, "Первичная заметка");
+        var owner = UserSession(XmlTestData.IntAttribute(data, "ownerId"), UserRole.User);
+        var another = UserSession(XmlTestData.IntAttribute(data, "actorId"), XmlTestData.RoleAttribute(data, "actorRole"));
+        var created = await service.AddAsync(owner, XmlTestData.Attribute(data, "noteText"));
 
-        var result = await service.EditAsync(another, created.Note!.Id, "Чужое изменение");
+        var result = await service.EditAsync(another, created.Note!.Id, XmlTestData.Attribute(data, "newText"));
 
-        Assert.IsFalse(result.Success);
+        Assert.AreEqual(XmlTestData.BoolAttribute(data, "success"), result.Success);
         StringAssert.Contains(result.Message, "чужую заметку");
     }
 
+    /// <summary>
+    /// Проверяет административное право на изменение заметки любого пользователя.
+    /// </summary>
     [TestMethod]
     [TestCategory("Заметки")]
     public async Task Admin_CanEditAnyNote()
     {
+        var data = XmlTestData.Case("roleAccess", "adminCanEditForeignNote");
         var repository = new InMemoryNoteRepository();
         var service = new NoteService(repository);
-        var owner = UserSession(1, UserRole.User);
-        var admin = UserSession(99, UserRole.Admin);
-        var created = await service.AddAsync(owner, "Заметка пользователя");
+        var owner = UserSession(XmlTestData.IntAttribute(data, "ownerId"), UserRole.User);
+        var admin = UserSession(XmlTestData.IntAttribute(data, "actorId"), XmlTestData.RoleAttribute(data, "actorRole"));
+        var created = await service.AddAsync(owner, XmlTestData.Attribute(data, "noteText"));
 
-        var result = await service.EditAsync(admin, created.Note!.Id, "Исправлено администратором");
+        var result = await service.EditAsync(admin, created.Note!.Id, XmlTestData.Attribute(data, "newText"));
 
-        Assert.IsTrue(result.Success);
+        Assert.AreEqual(XmlTestData.BoolAttribute(data, "success"), result.Success);
     }
 
     private static UserSession UserSession(int id, UserRole role)

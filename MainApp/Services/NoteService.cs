@@ -23,6 +23,11 @@ public sealed class NoteService
     /// </summary>
     public async Task<(OperationResult Result, Note? Note)> AddAsync(UserSession session, string text, CancellationToken cancellationToken = default)
     {
+        if (!CanUsePersonalNotes(session))
+        {
+            return (OperationResult.Fail("Заметки недоступны роли statistician."), null);
+        }
+
         if (string.IsNullOrWhiteSpace(text))
         {
             return (OperationResult.Fail("Нельзя добавить пустую заметку."), null);
@@ -36,25 +41,36 @@ public sealed class NoteService
     /// Возвращает все заметки пользователя.
     /// </summary>
     public Task<IReadOnlyList<Note>> ListAsync(UserSession session, CancellationToken cancellationToken = default)
-        => _notes.GetByUserAsync(session.User.Id, session.RoleConnectionString, cancellationToken);
+        => CanUsePersonalNotes(session)
+            ? _notes.GetByUserAsync(session.User.Id, session.RoleConnectionString, cancellationToken)
+            : Task.FromResult<IReadOnlyList<Note>>(Array.Empty<Note>());
 
     /// <summary>
     /// Возвращает последние заметки пользователя.
     /// </summary>
     public Task<IReadOnlyList<Note>> RecentAsync(UserSession session, int count, CancellationToken cancellationToken = default)
-        => _notes.GetRecentAsync(session.User.Id, Math.Clamp(count, 1, 100), session.RoleConnectionString, cancellationToken);
+        => CanUsePersonalNotes(session)
+            ? _notes.GetRecentAsync(session.User.Id, Math.Clamp(count, 1, 100), session.RoleConnectionString, cancellationToken)
+            : Task.FromResult<IReadOnlyList<Note>>(Array.Empty<Note>());
 
     /// <summary>
     /// Ищет заметки пользователя по тексту.
     /// </summary>
     public Task<IReadOnlyList<Note>> SearchAsync(UserSession session, string query, CancellationToken cancellationToken = default)
-        => _notes.SearchAsync(session.User.Id, query, session.RoleConnectionString, cancellationToken);
+        => CanUsePersonalNotes(session)
+            ? _notes.SearchAsync(session.User.Id, query, session.RoleConnectionString, cancellationToken)
+            : Task.FromResult<IReadOnlyList<Note>>(Array.Empty<Note>());
 
     /// <summary>
     /// Изменяет свою заметку или любую заметку администратора.
     /// </summary>
     public async Task<OperationResult> EditAsync(UserSession session, int id, string text, CancellationToken cancellationToken = default)
     {
+        if (!CanUsePersonalNotes(session))
+        {
+            return OperationResult.Fail("Заметки недоступны роли statistician.");
+        }
+
         if (string.IsNullOrWhiteSpace(text))
         {
             return OperationResult.Fail("Текст заметки не может быть пустым.");
@@ -80,6 +96,11 @@ public sealed class NoteService
     /// </summary>
     public async Task<OperationResult> DeleteAsync(UserSession session, int id, CancellationToken cancellationToken = default)
     {
+        if (!CanUsePersonalNotes(session))
+        {
+            return OperationResult.Fail("Заметки недоступны роли statistician.");
+        }
+
         var note = await _notes.FindAsync(id, session.RoleConnectionString, cancellationToken);
         if (note is null)
         {
@@ -127,4 +148,7 @@ public sealed class NoteService
         var notes = await _notes.GetByUserAsync(userId, session.RoleConnectionString, cancellationToken);
         return (OperationResult.Ok("Заметки пользователя получены."), notes);
     }
+
+    private static bool CanUsePersonalNotes(UserSession session)
+        => session.User.Role is UserRole.User or UserRole.Admin;
 }
